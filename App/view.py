@@ -36,7 +36,7 @@ Presenta el menu de opciones y por cada seleccion
 se hace la solicitud al controlador para ejecutar la
 operación solicitada
 """
-sys.setrecursionlimit(1000)
+sys.setrecursionlimit(10000)
 def printMenu():
     print("Bienvenido")
     print("1- Cargar información en el catálogo")

@@ -40,7 +40,7 @@ los mismos.
 
 # Construccion de modelos
 def newcatalog():
-    catalog = {'Fullroutes': None, 'Bothwaysroutes': None}
+    catalog = {'Fullroutes': None, 'Bothwaysroutes': None, 'Fullroutesaux':None}
     catalog['Fullroutes'] = grph.newGraph(datastructure= 'ADJ_LIST', directed= True)
     catalog['Bothwaysroutes'] = grph.newGraph(directed= False)
     return catalog
