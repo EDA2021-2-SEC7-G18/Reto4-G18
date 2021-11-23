@@ -20,9 +20,12 @@
  * along withthis program.  If not, see <http://www.gnu.org/licenses/>.
  """
 
+#rom App.model import addairport
+import model
 import config as cf
 import sys
 import controller
+import csv
 from DISClib.ADT import list as lt
 assert cf
 
@@ -33,7 +36,7 @@ Presenta el menu de opciones y por cada seleccion
 se hace la solicitud al controlador para ejecutar la
 operación solicitada
 """
-
+sys.setrecursionlimit(1000)
 def printMenu():
     print("Bienvenido")
     print("1- Cargar información en el catálogo")
@@ -43,17 +46,30 @@ def printMenu():
     print("5- Utilizar las millas de viajero")
     print("6- Cuantificar el efecto de un aeropuerto cerrado")
 
+def files():
+    airports_filepath = cf.data_dir + 'airports_full.csv'
+    routes_filepath = cf.data_dir + 'routes_full.csv'
+    airports_file = csv.DictReader(open(airports_filepath, encoding="utf-8"),
+                                delimiter=",")
+    routes_file = csv.DictReader(open(routes_filepath, encoding="utf-8"),
+                                delimiter=",")
+    return airports_file, routes_file
+
 catalog = None
 
 """
 Menu principal
 """
+
 while True:
+    airports_file, routes_file = files()
     printMenu()
     inputs = input('Seleccione una opción para continuar\n')
     if int(inputs[0]) == 1:
         print("Cargando información de los archivos ....")
-
+        catalog = controller.initcatalog()
+        controller.loadcatalog(catalog, airports_file, routes_file)
+        print(controller.Bothwaysroutes(catalog))
     elif int(inputs[0]) == 2:
         
         print("Encontrando puntos de interconexión aérea ....")
