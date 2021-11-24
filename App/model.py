@@ -28,7 +28,7 @@
 import config as cf
 from DISClib.ADT import list as lt
 from DISClib.ADT import graph as grph
-from DISClib.ADT import map as mp
+from DISClib.ADT import map 
 from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Sorting import shellsort as sa
 assert cf
@@ -40,15 +40,17 @@ los mismos.
 
 # Construccion de modelos
 def newcatalog():
-    catalog = {'Fullroutes': None, 'Bothwaysroutes': None, 'Fullroutesaux':None}
+    catalog = {'Fullroutes': None, 'Bothwaysroutes': None, 'airports':None}
     catalog['Fullroutes'] = grph.newGraph(datastructure= 'ADJ_LIST', directed= True)
     catalog['Bothwaysroutes'] = grph.newGraph(directed= False)
+    catalog['airports']= map.newMap()
     return catalog
 
 # Funciones para agregar informacion al catalogo
 def addairport(catalog, airport):
     grph.insertVertex(catalog['Fullroutes'], airport["IATA"])
-
+    map.put(catalog['airports'], airport['IATA'], airport)
+    
 def addroute(catalog, route):
     vertexa = route['Departure']
     vertexb = route['Destination']

@@ -28,7 +28,8 @@ import controller
 import csv
 from DISClib.ADT import list as lt
 assert cf
-
+import time
+from DISClib.ADT import graph as grph
 
 """
 La vista se encarga de la interacción con el usuario
@@ -67,12 +68,23 @@ while True:
     inputs = input('Seleccione una opción para continuar\n')
     if int(inputs[0]) == 1:
         print("Cargando información de los archivos ....")
+        starttime = time.time()
         catalog = controller.initcatalog()
         controller.loadcatalog(catalog, airports_file, routes_file)
-        print(controller.Bothwaysroutes(catalog))
+        controller.Bothwaysroutes(catalog)
+        totalairports = grph.numVertices(catalog['Fullroutes'])
+        bothwaysairports = grph.numVertices(catalog['Bothwaysroutes'])
+        totalroutes = grph.numEdges(catalog['Fullroutes'])
+        bothwaysroutes = grph.numEdges(catalog['Bothwaysroutes'])
+        print('Aeropuertos indice Fullroutes: ' + str(totalairports))
+        print('Aeropuertos indice Botheaysroutes: '+ str(bothwaysairports))
+        print('Total de rutas: '+str(totalroutes))
+        print('Both ways routes: ' + str(bothwaysroutes))
+        print("--- %s seconds ---" % (time.time() - starttime))
     elif int(inputs[0]) == 2:
         
         print("Encontrando puntos de interconexión aérea ....")
+        print(catalog['Bothwaysroutes'])
 
     elif int(inputs[0]) == 3:
         

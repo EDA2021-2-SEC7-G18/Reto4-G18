@@ -20,6 +20,7 @@
  * along withthis program.  If not, see <http://www.gnu.org/licenses/>.
  """
 
+from DISClib.DataStructures.chaininghashtable import rehash
 import config as cf
 import model
 from DISClib.ADT import list as lt
@@ -42,7 +43,7 @@ def loadcatalog(catalog, airports_file, routes_file):
     addairports(catalog, airports_file)
     addroutes(catalog, routes_file)
     addauxindex(catalog)
-
+    
 def addauxindex(catalog):
     catalog['Fullroutesaux'] = catalog['Fullroutes']
 
@@ -55,20 +56,23 @@ def addroutes(catalog, routes_file):
         model.addroute(catalog, route)
 
 def Bothwaysroutes(catalog):
-    vertices = grph.vertices(catalog['Fullroutesaux'])
-    res = []
+    vertices = grph.vertices(catalog['Fullroutes'])
+    res=map.newMap()
     for airport in lt.iterator(vertices):
-        
-        adyacentes = grph.adjacents(catalog['Fullroutesaux'], airport)
+        adyacentes = grph.adjacents(catalog['Fullroutes'], airport)
         for vertexb in lt.iterator(adyacentes):
-            adyacentesb = grph.adjacents(catalog['Fullroutesaux'], vertexb)
+            peso = e.weight(grph.getEdge(catalog['Fullroutes'], airport, vertexb))
+            adyacentesb = grph.adjacents(catalog['Fullroutes'], vertexb)
             for adyacenteb in lt.iterator(adyacentesb):
                 if adyacenteb == airport:
-                    if adyacenteb not in res:
-                        grph.insertVertex(catalog['Bothwaysroutes'], adyacenteb)
-                        grph.addEdge(catalog['Bothwaysroutes'], airport, adyacenteb)
+                    #if not map.contains(res, adyacenteb): #adyacenteb not in res:
+                        #print(verta, vertb, peso, 'siii')
+                    grph.insertVertex(catalog['Bothwaysroutes'], airport)
+                    grph.insertVertex(catalog['Bothwaysroutes'], vertexb)
+                    grph.addEdge(catalog['Bothwaysroutes'], airport, vertexb, peso)
+                    map.put(res, adyacenteb, '')
        
-    return res
+    
 # Funciones de ordenamiento
 
 # Funciones de consulta sobre el catálogo
