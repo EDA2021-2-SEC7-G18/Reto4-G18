@@ -30,7 +30,7 @@ from DISClib.ADT import list as lt
 assert cf
 import time
 from DISClib.ADT import graph as grph
-
+from DISClib.ADT import orderedmap as om
 """
 La vista se encarga de la interacción con el usuario
 Presenta el menu de opciones y por cada seleccion
@@ -50,11 +50,17 @@ def printMenu():
 def files():
     airports_filepath = cf.data_dir + 'airports_full.csv'
     routes_filepath = cf.data_dir + 'routes_full.csv'
+    cities_filepath = cf.data_dir + 'worldcities.csv'
     airports_file = csv.DictReader(open(airports_filepath, encoding="utf-8"),
                                 delimiter=",")
     routes_file = csv.DictReader(open(routes_filepath, encoding="utf-8"),
                                 delimiter=",")
-    return airports_file, routes_file
+    cities_file = csv.DictReader(open(cities_filepath, encoding="utf-8"),
+                                delimiter=",")
+    citylt = list(cities_file)
+    lastcity = citylt[-1]
+    
+    return airports_file, routes_file, cities_file, lastcity
 
 catalog = None
 
@@ -63,28 +69,35 @@ Menu principal
 """
 
 while True:
-    airports_file, routes_file = files()
+    airports_file, routes_file, cities_file, firstcity = files()
     printMenu()
     inputs = input('Seleccione una opción para continuar\n')
     if int(inputs[0]) == 1:
         print("Cargando información de los archivos ....")
+      
         starttime = time.time()
         catalog = controller.initcatalog()
-        controller.loadcatalog(catalog, airports_file, routes_file)
+        controller.loadcatalog(catalog, airports_file, routes_file, cities_file)
         controller.Bothwaysroutes(catalog)
+        
         totalairports = grph.numVertices(catalog['Fullroutes'])
         bothwaysairports = grph.numVertices(catalog['Bothwaysroutes'])
         totalroutes = grph.numEdges(catalog['Fullroutes'])
         bothwaysroutes = grph.numEdges(catalog['Bothwaysroutes'])
+        
+        print('ultima ciudad cargada: ' + str(firstcity['city'] + ' latitud: ' + str(firstcity['lat'])
+                + ' longitud '+ str(firstcity['lng'] + ' poblacoin ' + str(firstcity['population']))))
         print('Aeropuertos indice Fullroutes: ' + str(totalairports))
         print('Aeropuertos indice Botheaysroutes: '+ str(bothwaysairports))
         print('Total de rutas: '+str(totalroutes))
         print('Both ways routes: ' + str(bothwaysroutes))
         print("--- %s seconds ---" % (time.time() - starttime))
+        
+
     elif int(inputs[0]) == 2:
         
         print("Encontrando puntos de interconexión aérea ....")
-        print(catalog['Bothwaysroutes'])
+        print(catalog['lnglatcityindex'])
 
     elif int(inputs[0]) == 3:
         

@@ -39,11 +39,21 @@ def initcatalog():
     return model.newcatalog()
 
 # Funciones para la carga de datos
-def loadcatalog(catalog, airports_file, routes_file):
+def loadcatalog(catalog, airports_file, routes_file, cities_file):
     addairports(catalog, airports_file)
     addroutes(catalog, routes_file)
     addauxindex(catalog)
+    updatecitiesindices(catalog, cities_file)
     
+
+def getfirstcity(cities_file):
+    
+    return next(cities_file)
+def updatecitiesindices(catalog, cities_file):
+    for city in cities_file:
+        model.addcity(catalog, city)
+        model.lnglatcityindex(catalog, city)
+        model.latlngcityindex(catalog, city)
 def addauxindex(catalog):
     catalog['Fullroutesaux'] = catalog['Fullroutes']
 
