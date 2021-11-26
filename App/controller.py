@@ -72,16 +72,23 @@ def Bothwaysroutes(catalog):
         adyacentes = grph.adjacents(catalog['Fullroutes'], airport)
         for vertexb in lt.iterator(adyacentes):
             peso = e.weight(grph.getEdge(catalog['Fullroutes'], airport, vertexb))
-            adyacentesb = grph.adjacents(catalog['Fullroutes'], vertexb)
-            for adyacenteb in lt.iterator(adyacentesb):
-                if adyacenteb == airport:
-                    #if not map.contains(res, adyacenteb): #adyacenteb not in res:
-                        #print(verta, vertb, peso, 'siii')
+            if grph.getEdge(catalog['Fullroutes'], airport, vertexb):
+                if grph.getEdge(catalog['Bothwaysroutes'], airport, vertexb) is None: #adyacenteb not in res:
                     grph.insertVertex(catalog['Bothwaysroutes'], airport)
                     grph.insertVertex(catalog['Bothwaysroutes'], vertexb)
                     grph.addEdge(catalog['Bothwaysroutes'], airport, vertexb, peso)
-                    map.put(res, adyacenteb, '')
-       
+                    
+            '''
+            adyacentesb = grph.adjacents(catalog['Fullroutes'], vertexb)
+            for adyacenteb in lt.iterator(adyacentesb):
+                if adyacenteb == airport:
+                    if not map.contains(res, adyacenteb): #adyacenteb not in res:
+                        
+                        grph.insertVertex(catalog['Bothwaysroutes'], airport)
+                        grph.insertVertex(catalog['Bothwaysroutes'], vertexb)
+                        grph.addEdge(catalog['Bothwaysroutes'], airport, vertexb, peso)
+                        map.put(res, adyacenteb, '')
+       '''
     
 # Funciones de ordenamiento
 

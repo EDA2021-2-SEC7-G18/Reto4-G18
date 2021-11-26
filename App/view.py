@@ -88,7 +88,7 @@ while True:
         print('ultima ciudad cargada: ' + str(firstcity['city'] + ' latitud: ' + str(firstcity['lat'])
                 + ' longitud '+ str(firstcity['lng'] + ' poblacoin ' + str(firstcity['population']))))
         print('Aeropuertos indice Fullroutes: ' + str(totalairports))
-        print('Aeropuertos indice Botheaysroutes: '+ str(bothwaysairports))
+        print('Aeropuertos indice Bothwaysroutes: '+ str(bothwaysairports))
         print('Total de rutas: '+str(totalroutes))
         print('Both ways routes: ' + str(bothwaysroutes))
         print("--- %s seconds ---" % (time.time() - starttime))

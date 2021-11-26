@@ -272,6 +272,8 @@ def getEdge(graph, vertexa, vertexb):
     """
     try:
         element = map.get(graph['vertices'], vertexa)
+        if element is None:
+            return None
         lst = element['value']
         for edge in lt.iterator(lst):
             if (graph['directed']):
