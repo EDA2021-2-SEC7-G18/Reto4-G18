@@ -107,6 +107,14 @@ while True:
         eleccion = int(input('ingrese el numero en el que estala ciudad que desea'))
         origen_elect = lt.getElement(citieslist, eleccion+1)
         print(origen_elect)
+        destino = str(input('Ingrese el nombre de la ciudad destino'))
+        entry2 = map.get(catalog['CityNameIndex'], destino)
+        citieslist2 = me.getValue(entry2)
+        table2 = controller.BuildTable(catalog, citieslist2)
+        print(table2)
+        eleccion = int(input('ingrese el numero en el que esta la ciudad que desea'))
+        destino_elect = lt.getElement(citieslist2, eleccion+1)
+        print(destino_elect)
         print("Encontrando clústeres de tráfico aéreo ....")
 
     elif int(inputs[0]) == 4:
