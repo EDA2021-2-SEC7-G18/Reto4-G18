@@ -19,8 +19,6 @@
  * You should have received a copy of the GNU General Public License
  * along withthis program.  If not, see <http://www.gnu.org/licenses/>.
  """
-
-from DISClib.DataStructures.chaininghashtable import rehash
 import config as cf
 import model
 from DISClib.ADT import list as lt
@@ -39,6 +37,10 @@ def initcatalog():
     return model.newcatalog()
 
 # Funciones para la carga de datos
+def updatecitiesindices(catalog, cities_file):
+    for city in cities_file:
+        model.AddCityByName(catalog, city)
+
 def loadcatalog(catalog, airports_file, routes_file, cities_file):
     addairports(catalog, airports_file)
     addroutes(catalog, routes_file)
@@ -49,11 +51,6 @@ def loadcatalog(catalog, airports_file, routes_file, cities_file):
 def getfirstcity(cities_file):
     
     return next(cities_file)
-def updatecitiesindices(catalog, cities_file):
-    for city in cities_file:
-        model.addcity(catalog, city)
-        model.lnglatcityindex(catalog, city)
-        model.latlngcityindex(catalog, city)
 def addauxindex(catalog):
     catalog['Fullroutesaux'] = catalog['Fullroutes']
 
@@ -78,18 +75,20 @@ def Bothwaysroutes(catalog):
                     grph.insertVertex(catalog['Bothwaysroutes'], vertexb)
                     grph.addEdge(catalog['Bothwaysroutes'], airport, vertexb, peso)
                     
-            '''
-            adyacentesb = grph.adjacents(catalog['Fullroutes'], vertexb)
-            for adyacenteb in lt.iterator(adyacentesb):
-                if adyacenteb == airport:
-                    if not map.contains(res, adyacenteb): #adyacenteb not in res:
-                        
-                        grph.insertVertex(catalog['Bothwaysroutes'], airport)
-                        grph.insertVertex(catalog['Bothwaysroutes'], vertexb)
-                        grph.addEdge(catalog['Bothwaysroutes'], airport, vertexb, peso)
-                        map.put(res, adyacenteb, '')
-       '''
-    
+
+#req 1
+#req 2
+#req 3
+def BuildTable(catalog, city):
+    if city != None:
+        condition = model.BuildTable(catalog, city)
+    else:
+        condition = 'City not Found'
+    return condition
+#req 4
+#req 5
+#req 6
+#req 7
 # Funciones de ordenamiento
 
 # Funciones de consulta sobre el catálogo

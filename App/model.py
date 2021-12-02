@@ -33,6 +33,7 @@ from DISClib.ADT import map
 from DISClib.ADT import orderedmap as om
 from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Sorting import shellsort as sa
+from prettytable import PrettyTable
 assert cf
 
 """
@@ -42,49 +43,23 @@ los mismos.
 
 # Construccion de modelos
 def newcatalog():
-    catalog = {'Fullroutes': None, 'Bothwaysroutes': None, 'airports':None, 'cities':None}
+    catalog = {'Fullroutes': None, 'Bothwaysroutes': None, 'airports':None, 'citiesIDindex':None, 'CityNameIndex': None, 'lnglatcityindex': None, 'latlngcityindex':None}
     catalog['Fullroutes'] = grph.newGraph(datastructure= 'ADJ_LIST', directed= True)
     catalog['Bothwaysroutes'] = grph.newGraph(directed= False)
-    catalog['airports']= map.newMap() #mapa por el IATA de cada airport
-    catalog['citiesIDindex'] = map.newMap() #mapa con keys el id de la ciudad
-    #se crearan dos indices para ciudades. Uno de ellos es un mapa keys = city['lng']  con values= map(keys = lat y value = city)
-    # el segundo indice de ciudades es la misma estructura pero esta vez el mapa latitudes contiene las longitudes 
-    #los indices fueron construidos con el fin de encontrar cual sera la distancia entre coordenadas dadas y las de una ciudad mediate el uso  del teorema de pitagoras.
-    #ejm: d = sq(lng2 + lat2)
-    
-    catalog['lnglatcityindex'] = om.newMap(omaptype= 'BST', comparefunction= cmpnumbers) #mapa keys = city['lng']  con values= otro mapa con keys = lat y value = city
-    catalog['latlngcityindex'] = om.newMap(omaptype= 'BST', comparefunction= cmpnumbers)
+    catalog['airports']= map.newMap(maptype= 'PROBING', loadfactor= 0.5) #mapa por el IATA de cada airport
+    catalog['CityNameIndex'] = map.newMap(maptype= 'PROBING', loadfactor= 0.5)
     return catalog
 
 # Funciones para agregar informacion al catalogo
-def addcity(catalog, city):
-    map.put(catalog['citiesIDindex'], city['id'], city)
-
-def lnglatcityindex(catalog, city):
-    lng = city['lng']
-    lat = city['lat']
-    if not om.contains(catalog['lnglatcityindex'],lng):
-        latmap = om.newMap(omaptype= 'BST')
-        om.put(latmap, lat, city)
-        om.put(catalog['lnglatcityindex'], lng, latmap)
-    else: 
-        latmapentry = om.get(catalog['lnglatcityindex'], lng)
-        latmap = me.getValue(latmapentry)
-        om.put(latmap, lat, city)
-        om.put(catalog['lnglatcityindex'], lng, latmap )
-
-def latlngcityindex(catalog, city):
-    lng = city['lng']
-    lat = city['lat']
-    if not om.contains(catalog['latlngcityindex'],lat):
-        lngmap = om.newMap(omaptype= 'BST')
-        om.put(lngmap, lng, city)
-        om.put(catalog['latlngcityindex'], lat, lngmap)
-    else: 
-        lngmapentry = om.get(catalog['latlngcityindex'], lng)
-        lngmap = me.getValue(lngmapentry)
-        om.put(lngmap, lng, city)
-        om.put(catalog['latlngcityindex'], lng, lngmap )
+def AddCityByName(catalog, city):
+    if not map.contains(catalog['CityNameIndex'], str(city['city_ascii'])):
+        newcitylist = lt.newList(datastructure='ARRAY_LIST', cmpfunction=None)
+        lt.addLast(newcitylist, city)
+        map.put(catalog['CityNameIndex'], str(city['city_ascii']), newcitylist)
+    else:
+        entry = map.get(catalog['CityNameIndex'], str(city['city_ascii']))
+        citylist = me.getValue(entry)
+        lt.addLast(citylist, city)
 
 def addairport(catalog, airport):
     grph.insertVertex(catalog['Fullroutes'], airport["IATA"])
@@ -95,6 +70,26 @@ def addroute(catalog, route):
     vertexb = route['Destination']
     weight = route['distance_km']
     grph.addEdge(catalog['Fullroutes'], vertexa, vertexb, weight)
+
+#req 1
+#req 2
+#req 3
+
+def BuildTable(catalog, issue):
+    counter = 0
+    table=PrettyTable()
+    table.field_names = ['Number', 'city', 'country' , 'state', 'longitude' , 'latitude']
+    table.align='l'
+    table._max_width= {'Number':4,'city':15 , 'country': 15, 'state':15, 'longitude':10, 'latitude':10}
+    for item in lt.iterator(issue):
+        table.add_row([counter, str(item['city']), str(item['country']),str(item['admin_name']), str(item['lng']), str(item['lat'])])
+        counter += 1
+    return table
+    
+#req 4
+#req 5
+#req 6
+#req 7
 # Funciones para creacion de datos
 
 # Funciones de consulta

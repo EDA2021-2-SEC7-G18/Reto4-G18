@@ -31,6 +31,8 @@ assert cf
 import time
 from DISClib.ADT import graph as grph
 from DISClib.ADT import orderedmap as om
+from DISClib.ADT import map 
+from DISClib.DataStructures import mapentry as me
 """
 La vista se encarga de la interacción con el usuario
 Presenta el menu de opciones y por cada seleccion
@@ -57,26 +59,23 @@ def files():
                                 delimiter=",")
     cities_file = csv.DictReader(open(cities_filepath, encoding="utf-8"),
                                 delimiter=",")
-    citylt = list(cities_file)
-    lastcity = citylt[-1]
+    #citylt = list(cities_file)
+    #lastcity = citylt[-1]
     
-    return airports_file, routes_file, cities_file, lastcity
-
-catalog = None
+    return airports_file, routes_file, cities_file
 
 """
 Menu principal
 """
 
 while True:
-    airports_file, routes_file, cities_file, firstcity = files()
+    airports_file, routes_file, cities_file = files()
     printMenu()
     inputs = input('Seleccione una opción para continuar\n')
     if int(inputs[0]) == 1:
         print("Cargando información de los archivos ....")
-      
-        starttime = time.time()
         catalog = controller.initcatalog()
+        starttime = time.time()
         controller.loadcatalog(catalog, airports_file, routes_file, cities_file)
         controller.Bothwaysroutes(catalog)
         
@@ -85,8 +84,8 @@ while True:
         totalroutes = grph.numEdges(catalog['Fullroutes'])
         bothwaysroutes = grph.numEdges(catalog['Bothwaysroutes'])
         
-        print('ultima ciudad cargada: ' + str(firstcity['city'] + ' latitud: ' + str(firstcity['lat'])
-                + ' longitud '+ str(firstcity['lng'] + ' poblacoin ' + str(firstcity['population']))))
+        #print('ultima ciudad cargada: ' + str(firstcity['city'] + ' latitud: ' + str(firstcity['lat'])
+               # + ' longitud '+ str(firstcity['lng'] + ' poblacion ' + str(firstcity['population']))))
         print('Aeropuertos indice Fullroutes: ' + str(totalairports))
         print('Aeropuertos indice Bothwaysroutes: '+ str(bothwaysairports))
         print('Total de rutas: '+str(totalroutes))
@@ -100,7 +99,14 @@ while True:
         print(catalog['lnglatcityindex'])
 
     elif int(inputs[0]) == 3:
-        
+        origen = str(input('Ingrese el nombre de la ciudad de origen'))
+        entry = map.get(catalog['CityNameIndex'], origen)
+        citieslist = me.getValue(entry)
+        table = controller.BuildTable(catalog, citieslist)
+        print(table)
+        eleccion = int(input('ingrese el numero en el que estala ciudad que desea'))
+        origen_elect = lt.getElement(citieslist, eleccion+1)
+        print(origen_elect)
         print("Encontrando clústeres de tráfico aéreo ....")
 
     elif int(inputs[0]) == 4:
