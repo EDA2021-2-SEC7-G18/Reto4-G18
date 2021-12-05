@@ -24,8 +24,10 @@ import model
 from DISClib.ADT import list as lt
 from DISClib.DataStructures import edge as e
 from DISClib.ADT import map
+from DISClib.Algorithms.Graphs import scc 
 import csv
 from DISClib.ADT import graph as grph
+
 
 
 """
@@ -92,3 +94,5 @@ def BuildTable(catalog, city):
 # Funciones de ordenamiento
 
 # Funciones de consulta sobre el catálogo
+def getcomponents(graph):
+    return scc.connectedComponents(graph)

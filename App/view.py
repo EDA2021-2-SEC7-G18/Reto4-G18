@@ -99,6 +99,9 @@ while True:
         print(catalog['lnglatcityindex'])
 
     elif int(inputs[0]) == 3:
+        componentes = controller.getcomponents(catalog['Fullroutes'])
+        print(componentes)
+    elif int(inputs[0]) == 4:
         origen = str(input('Ingrese el nombre de la ciudad de origen'))
         entry = map.get(catalog['CityNameIndex'], origen)
         citieslist = me.getValue(entry)
@@ -116,10 +119,6 @@ while True:
         destino_elect = lt.getElement(citieslist2, eleccion+1)
         print(destino_elect)
         print("Encontrando clústeres de tráfico aéreo ....")
-
-    elif int(inputs[0]) == 4:
-        print("Buscando ruta más corta ....")
-
       
     
     elif int(inputs[0]) == 5:
