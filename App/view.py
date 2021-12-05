@@ -50,9 +50,9 @@ def printMenu():
     print("6- Cuantificar el efecto de un aeropuerto cerrado")
 
 def files():
-    airports_filepath = cf.data_dir + 'airports_full.csv'
-    routes_filepath = cf.data_dir + 'routes_full.csv'
-    cities_filepath = cf.data_dir + 'worldcities.csv'
+    airports_filepath = cf.data_dir + 'airports-utf8-small.csv'
+    routes_filepath = cf.data_dir + 'routes-utf8-small.csv'
+    cities_filepath = cf.data_dir + 'worldcities-utf8.csv'
     airports_file = csv.DictReader(open(airports_filepath, encoding="utf-8"),
                                 delimiter=",")
     routes_file = csv.DictReader(open(routes_filepath, encoding="utf-8"),
@@ -92,19 +92,20 @@ while True:
         print('Both ways routes: ' + str(bothwaysroutes))
         print("--- %s seconds ---" % (time.time() - starttime))
         
-
-    elif int(inputs[0]) == 2:
         
+    elif int(inputs[0]) == 2:
+        keys, connectionsmap = controller.MostConnected(catalog['Fullroutes'])
+        table = controller.BuildMostConnectedTable(catalog,connectionsmap,keys)
+        print(table)
         print("Encontrando puntos de interconexión aérea ....")
-        print(catalog['lnglatcityindex'])
-
+        
     elif int(inputs[0]) == 3:
         origen = str(input('Ingrese el nombre de la ciudad de origen'))
         entry = map.get(catalog['CityNameIndex'], origen)
         citieslist = me.getValue(entry)
         table = controller.BuildTable(catalog, citieslist)
         print(table)
-        eleccion = int(input('ingrese el numero en el que estala ciudad que desea'))
+        eleccion = int(input('ingrese el numero en el que esta la ciudad que desea'))
         origen_elect = lt.getElement(citieslist, eleccion+1)
         print(origen_elect)
         destino = str(input('Ingrese el nombre de la ciudad destino'))

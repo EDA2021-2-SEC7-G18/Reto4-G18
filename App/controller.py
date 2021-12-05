@@ -64,7 +64,6 @@ def addroutes(catalog, routes_file):
 
 def Bothwaysroutes(catalog):
     vertices = grph.vertices(catalog['Fullroutes'])
-    res=map.newMap()
     for airport in lt.iterator(vertices):
         adyacentes = grph.adjacents(catalog['Fullroutes'], airport)
         for vertexb in lt.iterator(adyacentes):
@@ -77,6 +76,12 @@ def Bothwaysroutes(catalog):
                     
 
 #req 1
+
+def MostConnected(graph):
+    return model.MostConnected(graph)
+def BuildMostConnectedTable(catalog, connectionsmap, top5):
+    return model.BuildMostConnectedTable(catalog, connectionsmap, top5)
+
 #req 2
 #req 3
 def BuildTable(catalog, city):
