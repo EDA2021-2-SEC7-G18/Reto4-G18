@@ -24,9 +24,13 @@ import model
 from DISClib.ADT import list as lt
 from DISClib.DataStructures import edge as e
 from DISClib.ADT import map
+from DISClib.Algorithms.Graphs.dfs import DepthFirstSearch
 from DISClib.Algorithms.Graphs import scc 
 import csv
+from DISClib.DataStructures import mapentry as me
 from DISClib.ADT import graph as grph
+from DISClib.ADT import orderedmap as om
+import DISClib.DataStructures.rbt as rbt
 
 
 
@@ -66,7 +70,6 @@ def addroutes(catalog, routes_file):
 
 def Bothwaysroutes(catalog):
     vertices = grph.vertices(catalog['Fullroutes'])
-    res=map.newMap()
     for airport in lt.iterator(vertices):
         adyacentes = grph.adjacents(catalog['Fullroutes'], airport)
         for vertexb in lt.iterator(adyacentes):
@@ -79,6 +82,12 @@ def Bothwaysroutes(catalog):
                     
 
 #req 1
+
+def MostConnected(graph):
+    return model.MostConnected(graph)
+def BuildMostConnectedTable(catalog, connectionsmap, top5):
+    return model.BuildMostConnectedTable(catalog, connectionsmap, top5)
+    
 #req 2
 #req 3
 def BuildTable(catalog, city):

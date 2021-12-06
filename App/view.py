@@ -92,12 +92,13 @@ while True:
         print('Both ways routes: ' + str(bothwaysroutes))
         print("--- %s seconds ---" % (time.time() - starttime))
         
-
-    elif int(inputs[0]) == 2:
         
-        print("Encontrando puntos de interconexión aérea ....")
-        print(catalog['lnglatcityindex'])
-
+    elif int(inputs[0]) == 2:
+        amountconnected, keys, connectionsmap = controller.MostConnected(catalog['Fullroutes'])
+        table = controller.BuildMostConnectedTable(catalog,connectionsmap,keys)
+        print('Connected airports inside network: ', amountconnected)
+        print('\n The TOP 5 most connected aiports... \n', table)
+        
     elif int(inputs[0]) == 3:
         verta = input("Ingrese el codigo IATA del aeropuerto 1: ")
         vertb = input("Ingrese el codigo IATA del aeropuerto 2: ")
@@ -114,7 +115,7 @@ while True:
         citieslist = me.getValue(entry)
         table = controller.BuildTable(catalog, citieslist)
         print(table)
-        eleccion = int(input('ingrese el numero en el que estala ciudad que desea'))
+        eleccion = int(input('ingrese el numero en el que esta la ciudad que desea'))
         origen_elect = lt.getElement(citieslist, eleccion+1)
         print(origen_elect)
         destino = str(input('Ingrese el nombre de la ciudad destino'))
