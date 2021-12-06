@@ -94,10 +94,10 @@ while True:
         
         
     elif int(inputs[0]) == 2:
-        keys, connectionsmap = controller.MostConnected(catalog['Fullroutes'])
+        amountconnected, keys, connectionsmap = controller.MostConnected(catalog['Fullroutes'])
         table = controller.BuildMostConnectedTable(catalog,connectionsmap,keys)
-        print(table)
-        print("Encontrando puntos de interconexión aérea ....")
+        print('Connected airports inside network: ', amountconnected)
+        print('\n The TOP 5 most connected aiports... \n', table)
         
     elif int(inputs[0]) == 3:
         origen = str(input('Ingrese el nombre de la ciudad de origen'))

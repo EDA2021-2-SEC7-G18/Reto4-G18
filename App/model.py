@@ -30,9 +30,11 @@ import config as cf
 from DISClib.ADT import list as lt
 from DISClib.ADT import graph as grph
 from DISClib.ADT import map 
+from DISClib.Algorithms.Graphs.dfs import DepthFirstSearch
 from DISClib.ADT import orderedmap as om
 from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Sorting import shellsort as sa
+import DISClib.DataStructures.rbt as rbt
 from prettytable import PrettyTable
 assert cf
 
@@ -76,6 +78,7 @@ def addroute(catalog, route):
 def MostConnected(graph):
     connectionsmap = om.newMap(omaptype='RBT', comparefunction=CompareTotalDegrees)
     vertices = grph.vertices(graph)
+    amountconnected = 0
     for vertex in lt.iterator(vertices):
         dict = {'Name':None, 'indegree': None, 'outdegree': None, 'TotalDegree':None}
         dict['Name'] = str(vertex)
@@ -90,9 +93,10 @@ def MostConnected(graph):
             entry = om.get(connectionsmap, dict['TotalDegree'])
             degreeslist = me.getValue(entry)
             lt.addLast(degreeslist, dict)
+        if dict['TotalDegree'] != '0':
+            amountconnected += 1
     keys = om.keySet(connectionsmap)
-    return keys, connectionsmap
-
+    return amountconnected, keys, connectionsmap
 def BuildMostConnectedTable(catalog, connectionsmap, top5):
     table=PrettyTable()
     table.field_names = ['Name', 'City', 'Country' , 'IATA', 'connections' , 'Inbound', 'Outbound']
@@ -108,8 +112,10 @@ def BuildMostConnectedTable(catalog, connectionsmap, top5):
             entry = map.get(catalog['airports'], codigoIATA)
             value = me.getValue(entry)
             table.add_row([value['Name'], str(value['City']), str(value['Country']), codigoIATA,str(element['TotalDegree']), str(element['indegree']), str(element['outdegree'])])
-            if counter >= 5:
+            if counter == 5:
                 break
+        if counter == 5:
+            break
     return table
 
 #req 2

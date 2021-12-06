@@ -24,8 +24,12 @@ import model
 from DISClib.ADT import list as lt
 from DISClib.DataStructures import edge as e
 from DISClib.ADT import map
+from DISClib.Algorithms.Graphs.dfs import DepthFirstSearch
 import csv
+from DISClib.DataStructures import mapentry as me
 from DISClib.ADT import graph as grph
+from DISClib.ADT import orderedmap as om
+import DISClib.DataStructures.rbt as rbt
 
 
 """
@@ -81,7 +85,7 @@ def MostConnected(graph):
     return model.MostConnected(graph)
 def BuildMostConnectedTable(catalog, connectionsmap, top5):
     return model.BuildMostConnectedTable(catalog, connectionsmap, top5)
-
+    
 #req 2
 #req 3
 def BuildTable(catalog, city):
