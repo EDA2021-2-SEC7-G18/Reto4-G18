@@ -95,4 +95,9 @@ def BuildTable(catalog, city):
 
 # Funciones de consulta sobre el catálogo
 def getcomponents(graph):
-    return scc.connectedComponents(graph)
+    sc = scc.KosarajuSCC(graph)
+    return scc.connectedComponents(sc)
+
+def RSC(graph, verta, vertb):
+    graphone = scc.KosarajuSCC(graph)
+    return scc.stronglyConnected(graphone, verta, vertb)
