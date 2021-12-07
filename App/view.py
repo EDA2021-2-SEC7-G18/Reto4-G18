@@ -33,6 +33,7 @@ from DISClib.ADT import graph as grph
 from DISClib.ADT import orderedmap as om
 from DISClib.ADT import map 
 from DISClib.DataStructures import mapentry as me
+from DISClib.Algorithms.Graphs.bfs import BreadhtFisrtSearch
 """
 La vista se encarga de la interacción con el usuario
 Presenta el menu de opciones y por cada seleccion
@@ -130,6 +131,8 @@ while True:
       
     
     elif int(inputs[0]) == 5:
+        IATAfuera = str(input('ingrese el codigo IATA del aeropuerto que esta fuera de funcionamiento'))
+        print(BreadhtFisrtSearch(catalog['Bothwaysroutes'], IATAfuera))
         print("Buscando ciudades recomendadas para viajar ....")
      
     

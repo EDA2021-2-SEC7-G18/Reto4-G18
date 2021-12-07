@@ -47,7 +47,7 @@ los mismos.
 def newcatalog():
     catalog = {'Fullroutes': None, 'Bothwaysroutes': None, 'airports':None, 'citiesIDindex':None, 'CityNameIndex': None}
     catalog['Fullroutes'] = grph.newGraph(datastructure= 'ADJ_LIST', directed= True)
-    catalog['Bothwaysroutes'] = grph.newGraph(directed= False)
+    catalog['Bothwaysroutes'] = grph.newGraph(datastructure = 'ADJ_LIST', directed= False)
     catalog['airports']= map.newMap(maptype= 'PROBING', loadfactor= 0.5) #mapa por el IATA de cada airport
     catalog['CityNameIndex'] = map.newMap(maptype= 'PROBING', loadfactor= 0.5)
     return catalog
@@ -134,6 +134,8 @@ def BuildTable(catalog, issue):
     
 #req 4
 #req 5
+def SearchAffectedAirports(catalog, IATAfuera):
+    return None
 #req 6
 #req 7
 # Funciones para creacion de datos
