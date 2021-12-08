@@ -30,9 +30,11 @@ import config as cf
 from DISClib.ADT import list as lt
 from DISClib.ADT import graph as grph
 from DISClib.ADT import map 
+from DISClib.Algorithms.Graphs.dfs import DepthFirstSearch
 from DISClib.ADT import orderedmap as om
 from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Sorting import shellsort as sa
+import DISClib.DataStructures.rbt as rbt
 from prettytable import PrettyTable
 assert cf
 
@@ -43,9 +45,9 @@ los mismos.
 
 # Construccion de modelos
 def newcatalog():
-    catalog = {'Fullroutes': None, 'Bothwaysroutes': None, 'airports':None, 'citiesIDindex':None, 'CityNameIndex': None, 'lnglatcityindex': None, 'latlngcityindex':None}
+    catalog = {'Fullroutes': None, 'Bothwaysroutes': None, 'airports':None, 'citiesIDindex':None, 'CityNameIndex': None}
     catalog['Fullroutes'] = grph.newGraph(datastructure= 'ADJ_LIST', directed= True)
-    catalog['Bothwaysroutes'] = grph.newGraph(directed= False)
+    catalog['Bothwaysroutes'] = grph.newGraph(datastructure = 'ADJ_LIST', directed= False)
     catalog['airports']= map.newMap(maptype= 'PROBING', loadfactor= 0.5) #mapa por el IATA de cada airport
     catalog['CityNameIndex'] = map.newMap(maptype= 'PROBING', loadfactor= 0.5)
     return catalog
@@ -72,6 +74,50 @@ def addroute(catalog, route):
     grph.addEdge(catalog['Fullroutes'], vertexa, vertexb, weight)
 
 #req 1
+
+def MostConnected(graph):
+    connectionsmap = om.newMap(omaptype='RBT', comparefunction=CompareTotalDegrees)
+    vertices = grph.vertices(graph)
+    amountconnected = 0
+    for vertex in lt.iterator(vertices):
+        dict = {'Name':None, 'indegree': None, 'outdegree': None, 'TotalDegree':None}
+        dict['Name'] = str(vertex)
+        dict['indegree'] = str(grph.indegree(graph,vertex))
+        dict['outdegree'] = str(grph.outdegree(graph,vertex))
+        dict['TotalDegree'] = str(int(dict['indegree']) + int(dict['outdegree']))
+        if not om.contains(connectionsmap, dict['TotalDegree']):
+            newlist = lt.newList(datastructure='ARRAY_LIST')
+            lt.addLast(newlist, dict)
+            om.put(connectionsmap, str(dict['TotalDegree']), newlist)
+        else:
+            entry = om.get(connectionsmap, dict['TotalDegree'])
+            degreeslist = me.getValue(entry)
+            lt.addLast(degreeslist, dict)
+        if dict['TotalDegree'] != '0':
+            amountconnected += 1
+    keys = om.keySet(connectionsmap)
+    return amountconnected, keys, connectionsmap
+def BuildMostConnectedTable(catalog, connectionsmap, top5):
+    table=PrettyTable()
+    table.field_names = ['Name', 'City', 'Country' , 'IATA', 'connections' , 'Inbound', 'Outbound']
+    table.align='l'
+    table._max_width= {'Name':15, 'City':10 , 'Country': 15, 'IATA':5, 'Connections':5, 'Inbound':5, 'Outbound':5}
+    counter = 0
+    for item in lt.iterator(top5):
+        entry2= om.get(connectionsmap, item)
+        value2 = me.getValue(entry2)
+        for element in lt.iterator(value2):
+            counter += 1
+            codigoIATA = str(element['Name'])
+            entry = map.get(catalog['airports'], codigoIATA)
+            value = me.getValue(entry)
+            table.add_row([value['Name'], str(value['City']), str(value['Country']), codigoIATA,str(element['TotalDegree']), str(element['indegree']), str(element['outdegree'])])
+            if counter == 5:
+                break
+        if counter == 5:
+            break
+    return table
+
 #req 2
 #req 3
 
@@ -88,6 +134,8 @@ def BuildTable(catalog, issue):
     
 #req 4
 #req 5
+def SearchAffectedAirports(catalog, IATAfuera):
+    return None
 #req 6
 #req 7
 # Funciones para creacion de datos
@@ -101,5 +149,13 @@ def cmpnumbers(uno, dos):
     if uno>dos:
         return 1
     else:
-        return -1       
-    
+        return -1    
+def CompareTotalDegrees(degree1, degree2)  :
+    degree11=int(degree1)
+    degree22=int(degree2)
+    if (degree11 == degree22):
+        return 0
+    elif degree11 < degree22:
+        return 1
+    else:
+        return -1  

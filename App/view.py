@@ -34,6 +34,7 @@ from DISClib.ADT import graph as grph
 from DISClib.ADT import orderedmap as om
 from DISClib.ADT import map 
 from DISClib.DataStructures import mapentry as me
+from DISClib.Algorithms.Graphs.bfs import BreadhtFisrtSearch
 """
 La vista se encarga de la interacción con el usuario
 Presenta el menu de opciones y por cada seleccion
@@ -53,7 +54,8 @@ def printMenu():
 def files():
     airports_filepath = cf.data_dir + 'airports-utf8-small.csv'
     routes_filepath = cf.data_dir + 'routes-utf8-small.csv'
-    cities_filepath = cf.data_dir + 'worldcities.csv'
+    cities_filepath = cf.data_dir + 'worldcities-utf8.csv'
+
     airports_file = csv.DictReader(open(airports_filepath, encoding="utf-8"),
                                 delimiter=",")
     routes_file = csv.DictReader(open(routes_filepath, encoding="utf-8"),
@@ -93,22 +95,30 @@ while True:
         print('Both ways routes: ' + str(bothwaysroutes))
         print("--- %s seconds ---" % (time.time() - starttime))
         
-
-    elif int(inputs[0]) == 2:
         
-        print("Encontrando puntos de interconexión aérea ....")
-        print(catalog['lnglatcityindex'])
-
+    elif int(inputs[0]) == 2:
+        amountconnected, keys, connectionsmap = controller.MostConnected(catalog['Fullroutes'])
+        table = controller.BuildMostConnectedTable(catalog,connectionsmap,keys)
+        print('Connected airports inside network: ', amountconnected)
+        print('\n The TOP 5 most connected aiports... \n', table)
+        
     elif int(inputs[0]) == 3:
+        verta = input("Ingrese el codigo IATA del aeropuerto 1: ")
+        vertb = input("Ingrese el codigo IATA del aeropuerto 2: ")
         componentes = controller.getcomponents(catalog['Fullroutes'])
-        print(componentes)
+        together = controller.RSC(catalog['Fullroutes'],verta, vertb )
+        print('componentes ' + str(componentes))
+        print('strongly connected: ' + str(together))
+        
+
+
     elif int(inputs[0]) == 4:
         origen = str(input('Ingrese el nombre de la ciudad de origen'))
         entry = map.get(catalog['CityNameIndex'], origen)
         citieslist = me.getValue(entry)
         table = controller.BuildTable(catalog, citieslist)
         print(table)
-        eleccion = int(input('ingrese el numero en el que estala ciudad que desea'))
+        eleccion = int(input('ingrese el numero en el que esta la ciudad que desea'))
         origen_elect = lt.getElement(citieslist, eleccion+1)
         print(origen_elect)
         destino = str(input('Ingrese el nombre de la ciudad destino'))
@@ -123,6 +133,8 @@ while True:
       
     
     elif int(inputs[0]) == 5:
+        IATAfuera = str(input('ingrese el codigo IATA del aeropuerto que esta fuera de funcionamiento'))
+        print(BreadhtFisrtSearch(catalog['Bothwaysroutes'], IATAfuera))
         print("Buscando ciudades recomendadas para viajar ....")
      
     
