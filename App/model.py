@@ -26,6 +26,8 @@
 
 
 from sys import call_tracing
+
+from haversine import haversine
 import config as cf
 from DISClib.ADT import list as lt
 from DISClib.ADT import graph as grph
@@ -35,6 +37,7 @@ from DISClib.ADT import orderedmap as om
 from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Sorting import shellsort as sa
 import DISClib.DataStructures.rbt as rbt
+import DISClib.Algorithms.Graphs.dijsktra as djk
 from prettytable import PrettyTable
 assert cf
 
@@ -45,11 +48,13 @@ los mismos.
 
 # Construccion de modelos
 def newcatalog():
-    catalog = {'Fullroutes': None, 'Bothwaysroutes': None, 'airports':None, 'citiesIDindex':None, 'CityNameIndex': None}
+    catalog = {'Fullroutes': None, 'Bothwaysroutes': None, 'airports':None, 'citiesIDindex':None, 'CityNameIndex': None,'CoordinatesTree':None}
     catalog['Fullroutes'] = grph.newGraph(datastructure= 'ADJ_LIST', directed= True)
     catalog['Bothwaysroutes'] = grph.newGraph(datastructure = 'ADJ_LIST', directed= False)
     catalog['airports']= map.newMap(maptype= 'PROBING', loadfactor= 0.5) #mapa por el IATA de cada airport
+    catalog['listairports'] = lt.newList(datastructure='ARRAY_LIST')
     catalog['CityNameIndex'] = map.newMap(maptype= 'PROBING', loadfactor= 0.5)
+    catalog['CoordinatesTree'] = om.newMap(omaptype='RBT', comparefunction=CompareLatitudes)
     return catalog
 
 # Funciones para agregar informacion al catalogo
@@ -66,12 +71,28 @@ def AddCityByName(catalog, city):
 def addairport(catalog, airport):
     grph.insertVertex(catalog['Fullroutes'], airport["IATA"])
     map.put(catalog['airports'], airport['IATA'], airport)
+    lt.addLast(catalog['listairports'], airport)
     
 def addroute(catalog, route):
     vertexa = route['Departure']
     vertexb = route['Destination']
-    weight = route['distance_km']
+    weight = float(route['distance_km'])
     grph.addEdge(catalog['Fullroutes'], vertexa, vertexb, weight)
+
+def updateLatitude(catalog, airport):
+    '''Arbol cuyas llaves son latitudes y sus hojas son arboles cuyas llaves son longitudes'''
+    latitude= str(airport['Latitude'])
+    entry = om.get(catalog['CoordinatesTree'], latitude)
+    longitudeIndex= {'longitude':None , 'IATA':None}
+    longitudeIndex['longitude'] = airport['Longitude']
+    longitudeIndex['IATA'] = airport['IATA']
+    if entry is None:
+        newlist = lt.newList(datastructure='ARRAY_LIST', cmpfunction=None)
+        lt.addLast(newlist, longitudeIndex)
+        om.put(catalog['CoordinatesTree'], latitude, newlist)
+    else:
+        oldlist = me.getValue(entry)
+        lt.addLast(oldlist, longitudeIndex)
 
 #req 1
 
@@ -97,6 +118,7 @@ def MostConnected(graph):
             amountconnected += 1
     keys = om.keySet(connectionsmap)
     return amountconnected, keys, connectionsmap
+
 def BuildMostConnectedTable(catalog, connectionsmap, top5):
     table=PrettyTable()
     table.field_names = ['Name', 'City', 'Country' , 'IATA', 'connections' , 'Inbound', 'Outbound']
@@ -131,6 +153,83 @@ def BuildTable(catalog, issue):
         table.add_row([counter, str(item['city']), str(item['country']),str(item['admin_name']), str(item['lng']), str(item['lat'])])
         counter += 1
     return table
+def Closest_To_Destiny(catalog, ciudad):
+    lat = float(ciudad['lat'])
+    lng = float(ciudad['lng'])
+    upperlat = float(lat)
+    lowerlat = float(lat)
+    upperlng = float(lng)
+    lowerlng = float(lng)
+    airportstree = om.newMap(omaptype='RBT', comparefunction = CompareDistance)
+    while om.size(airportstree) < 1:
+        upperlat += 0.1
+        lowerlat -= 0.1
+        upperlng += 0.1
+        lowerlng -= 0.1
+        lat_in_range = om.keys(catalog['CoordinatesTree'],str(lowerlat), str(upperlat))
+        for latitude in lt.iterator(lat_in_range):
+            if lat_in_range is not None:
+                entry = om.get(catalog['CoordinatesTree'], str(latitude))
+                longitudeindex = me.getValue(entry)
+                for airport in lt.iterator(longitudeindex):
+                    IATAcode = airport['IATA']
+                    if lowerlng < float(airport['longitude']) < upperlng:
+                        city_coordinates = (lat,lng)
+                        airport_coordinates = (float(latitude), float(airport['longitude']))
+                        distance = haversine(city_coordinates, airport_coordinates)
+                        if not om.contains(airportstree, str(distance)):
+                            om.put(airportstree, str(distance), str(IATAcode))
+    return airportstree
+
+def Closest_Path(catalog, ciudadorigen, ciudaddestino):
+    lat = float(ciudadorigen['lat'])
+    lng = float(ciudadorigen['lng'])
+    upperlat = float(lat)
+    lowerlat = float(lat)
+    upperlng = float(lng)
+    lowerlng = float(lng)
+    airportstree = om.newMap(omaptype='RBT', comparefunction=CompareDistance)
+    destinytree = Closest_To_Destiny(catalog, ciudaddestino)
+    closestdestiny = om.minKey(destinytree)
+    entry = om.get(destinytree, str(closestdestiny))
+    destinyIATA = me.getValue(entry)
+    condition = True
+    while condition:
+        upperlat += 0.1
+        lowerlat -= 0.1
+        upperlng += 0.1
+        lowerlng -= 0.1
+        lat_in_range = om.keys(catalog['CoordinatesTree'],str(lowerlat), str(upperlat))
+        if lat_in_range != None:
+            for latitude in lt.iterator(lat_in_range):
+                entry = om.get(catalog['CoordinatesTree'], str(latitude))
+                longitudeindex = me.getValue(entry)
+                for airport in lt.iterator(longitudeindex):
+                    IATAcode = airport['IATA']
+                    if lowerlng < float(airport['longitude']) < upperlng:
+                            city_coordinates = (lat,lng)
+                            airport_coordinates = (float(latitude), float(airport['longitude']))
+                            distance = haversine(city_coordinates, airport_coordinates)
+                            if not om.contains(airportstree, str(distance)):
+                                om.put(airportstree, str(distance), str(IATAcode))
+        keys = om.keySet(airportstree)
+        for item in lt.iterator(keys):
+            entry = om.get(airportstree, item)
+            codigoIATA = me.getValue(entry)
+            search = djk.Dijkstra(catalog['Fullroutes'], codigoIATA)
+            if djk.hasPathTo(search, destinyIATA):
+                minpath = djk.pathTo(search, destinyIATA)
+                condition = False
+    return minpath
+def FindMinRoute(catalog, ciudadorigen, ciudaddestino):
+    destinytree = Closest_To_Destiny(catalog, ciudaddestino)
+        
+
+    
+                        
+
+
+
     
 #req 4
 #req 5
@@ -159,3 +258,21 @@ def CompareTotalDegrees(degree1, degree2)  :
         return 1
     else:
         return -1  
+def CompareLatitudes(lat1, lat2):
+    lat11=float(lat1)
+    lat22=float(lat2)
+    if (lat11 == lat22):
+        return 0
+    elif lat11 > lat22:
+        return 1
+    else:
+        return -1
+def CompareDistance(dist1, dist2):
+    dist11=float(dist1)
+    dist22=float(dist2)
+    if (dist11 == dist22):
+        return 0
+    elif dist11 > dist22:
+        return 1
+    else:
+        return -1
