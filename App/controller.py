@@ -107,6 +107,8 @@ def BuildTable(catalog, city):
 #req 5
 def Closest_Path(catalog, ciudadorigen, ciudaddestino):
     return model.Closest_Path(catalog, ciudadorigen, ciudaddestino)
+def Build_Tables_Req_5(catalog, dictionary ):
+    return model.Build_Tables_Req_5(catalog, dictionary)
 #req 6
 #req 7
 # Funciones de ordenamiento

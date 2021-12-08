@@ -218,12 +218,25 @@ def Closest_Path(catalog, ciudadorigen, ciudaddestino):
             codigoIATA = me.getValue(entry)
             search = djk.Dijkstra(catalog['Fullroutes'], codigoIATA)
             if djk.hasPathTo(search, destinyIATA):
+                origindict = {'distance':None, 'IATA':None, }
+                destinydict ={'distance':None, 'IATA':None}
+                origindict['distance'] = item
+                origindict['IATA'] = codigoIATA
+                destinydict['distance'] = closestdestiny
+                destinydict['IATA'] = destinyIATA
                 minpath = djk.pathTo(search, destinyIATA)
                 condition = False
-    return minpath
-def FindMinRoute(catalog, ciudadorigen, ciudaddestino):
-    destinytree = Closest_To_Destiny(catalog, ciudaddestino)
-        
+    return origindict, destinyIATA, minpath
+def Build_Tables_Req_5(catalog, dictionary):
+    print(dictionary['IATA'])
+    table=PrettyTable()
+    table.field_names = ['IATA', 'Name', 'City' , 'Country']
+    table.align='l'
+    table._max_width= {'IATA':5, 'Name':20, 'City':15 , 'Country':15}
+    entry = map.get(catalog['airports'], str(dictionary['IATA']))
+    airport = me.getValue(entry)
+    table.add_row([dictionary['IATA'], airport['Name'], airport['City'], airport['Country']])
+    return table
 
     
                         

@@ -128,7 +128,13 @@ while True:
         eleccion = int(input('ingrese el numero en el que esta la ciudad que desea'))
         destino_elect = lt.getElement(citieslist2, eleccion+1)
         print(destino_elect)
-        result = controller.Closest_Path(catalog, origen_elect, destino_elect)
+        origindict, destinydict, result = controller.Closest_Path(catalog, origen_elect, destino_elect)
+        print(origindict['IATA'])
+        origintable = controller.Build_Tables_Req_5(catalog, origindict)
+        destinytable = controller.Build_Tables_Req_5(catalog, destinydict)
+
+        print('The departure airport in', origen_elect['city_ascii'], 'is \n' ,origintable)
+        print('The arrival airport in', destino_elect['city_ascii'], 'is \n' ,destinytable)
         print(result)
         print("Encontrando clústeres de tráfico aéreo ....")
       
