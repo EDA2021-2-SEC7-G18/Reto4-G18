@@ -21,7 +21,6 @@
  """
 
 #rom App.model import addairport
-import model
 import config as cf
 import sys
 import controller
@@ -128,15 +127,17 @@ while True:
         eleccion = int(input('ingrese el numero en el que esta la ciudad que desea'))
         destino_elect = lt.getElement(citieslist2, eleccion+1)
         print(destino_elect)
-        origindict, destinydict, result = controller.Closest_Path(catalog, origen_elect, destino_elect)
-        print(origindict['IATA'])
+        origindict, destinydict, path = controller.Closest_Path(catalog, origen_elect, destino_elect)
+        distancebetweenairports= float(origindict['distance']) + float(destinydict['distance'])
         origintable = controller.Build_Tables_Req_5(catalog, origindict)
         destinytable = controller.Build_Tables_Req_5(catalog, destinydict)
-
-        print('The departure airport in', origen_elect['city_ascii'], 'is \n' ,origintable)
-        print('The arrival airport in', destino_elect['city_ascii'], 'is \n' ,destinytable)
-        print(result)
-        print("Encontrando clústeres de tráfico aéreo ....")
+        weightsum, pathtable = controller.Build_Path_Table(catalog, path)
+        totaldistance = float(weightsum) + distancebetweenairports
+        stopstable = controller.StopsTable(catalog, path)
+        print('+++ The departure airport in', origen_elect['city_ascii'], 'is +++\n' ,origintable)
+        print('+++ The arrival airport in', destino_elect['city_ascii'], 'is +++\n' ,destinytable)
+        print('+++ Dijkstras Trip details +++\n', '- Total Route Distance: ', weightsum,' (km) \n', '- Total Distance (counting distance between cities and airport): ', round(totaldistance,3),' (km) \n','- Trip Path:\n', pathtable)
+        print('+++ Trip Stops +++ \n', stopstable)
       
     
     elif int(inputs[0]) == 5:
@@ -146,6 +147,7 @@ while True:
     
 
     elif int(inputs[0]) == 6:
+        print((catalog['RoutesMap']))
         print("Calculando el efecto de aeropuerto cerrado ....")
         
     else:

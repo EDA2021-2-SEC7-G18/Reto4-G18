@@ -26,6 +26,7 @@
 
 
 from sys import call_tracing
+from typing import OrderedDict
 
 from haversine import haversine
 import config as cf
@@ -48,13 +49,14 @@ los mismos.
 
 # Construccion de modelos
 def newcatalog():
-    catalog = {'Fullroutes': None, 'Bothwaysroutes': None, 'airports':None, 'citiesIDindex':None, 'CityNameIndex': None,'CoordinatesTree':None}
+    catalog = {'Fullroutes': None, 'Bothwaysroutes': None, 'airports':None, 'citiesIDindex':None, 'CityNameIndex': None,'CoordinatesTree':None, 'RoutesMap':None}
     catalog['Fullroutes'] = grph.newGraph(datastructure= 'ADJ_LIST', directed= True)
     catalog['Bothwaysroutes'] = grph.newGraph(datastructure = 'ADJ_LIST', directed= False)
     catalog['airports']= map.newMap(maptype= 'PROBING', loadfactor= 0.5) #mapa por el IATA de cada airport
     catalog['listairports'] = lt.newList(datastructure='ARRAY_LIST')
     catalog['CityNameIndex'] = map.newMap(maptype= 'PROBING', loadfactor= 0.5)
     catalog['CoordinatesTree'] = om.newMap(omaptype='RBT', comparefunction=CompareLatitudes)
+    catalog['RoutesMap'] = map.newMap(maptype= 'PROBING', loadfactor= 0.5)
     return catalog
 
 # Funciones para agregar informacion al catalogo
@@ -78,6 +80,8 @@ def addroute(catalog, route):
     vertexb = route['Destination']
     weight = float(route['distance_km'])
     grph.addEdge(catalog['Fullroutes'], vertexa, vertexb, weight)
+    key = str(vertexa)+ ',' + str(vertexb) + ',' + str(weight)
+    map.put(catalog['RoutesMap'], key, route['Airline'])
 
 def updateLatitude(catalog, airport):
     '''Arbol cuyas llaves son latitudes y sus hojas son arboles cuyas llaves son longitudes'''
@@ -218,29 +222,57 @@ def Closest_Path(catalog, ciudadorigen, ciudaddestino):
             codigoIATA = me.getValue(entry)
             search = djk.Dijkstra(catalog['Fullroutes'], codigoIATA)
             if djk.hasPathTo(search, destinyIATA):
-                origindict = {'distance':None, 'IATA':None, }
-                destinydict ={'distance':None, 'IATA':None}
+                origindict = OrderedDict()
+                destinydict = OrderedDict()
                 origindict['distance'] = item
                 origindict['IATA'] = codigoIATA
                 destinydict['distance'] = closestdestiny
                 destinydict['IATA'] = destinyIATA
                 minpath = djk.pathTo(search, destinyIATA)
                 condition = False
-    return origindict, destinyIATA, minpath
+    return origindict, destinydict, minpath
 def Build_Tables_Req_5(catalog, dictionary):
-    print(dictionary['IATA'])
     table=PrettyTable()
     table.field_names = ['IATA', 'Name', 'City' , 'Country']
     table.align='l'
-    table._max_width= {'IATA':5, 'Name':20, 'City':15 , 'Country':15}
-    entry = map.get(catalog['airports'], str(dictionary['IATA']))
+    table._max_width= {'IATA':5, 'Name':30, 'City':15 , 'Country':15}
+    IATAcode = dictionary['IATA']
+    entry = map.get(catalog['airports'], IATAcode)
     airport = me.getValue(entry)
-    table.add_row([dictionary['IATA'], airport['Name'], airport['City'], airport['Country']])
+    table.add_row([IATAcode, airport['Name'], airport['City'], airport['Country']])
     return table
 
-    
-                        
-
+def Build_Path_Table(catalog, path):
+    table=PrettyTable()
+    table.field_names = ['Airline', 'Departure', 'Destination', 'distance_km']
+    table.align='l'
+    table._max_width= {'Airline':5, 'Departure':10, 'Destination':10, 'distance_km':10}
+    weightsum = 0.0
+    for item in lt.iterator(path):
+        weight = item['weight']
+        weightsum += float(weight)
+        vertexA = item['vertexA']
+        vertexB = item['vertexB']
+        key = str(vertexA) + ',' + str(vertexB) + ',' + str(weight)
+        airlineentry = map.get(catalog['RoutesMap'],key)
+        airline = me.getValue(airlineentry)
+        table.add_row([airline, vertexA, vertexB, weight])
+    return weightsum, table
+def StopsTable(catalog, stops):          
+    table=PrettyTable()
+    table.field_names = ['IATA', 'Name', 'City' , 'Country']
+    table.align='l'
+    table._max_width= {'IATA':5, 'Name':30, 'City':15 , 'Country':15}
+    for item in lt.iterator(stops):
+        vertexA = item['vertexA']
+        entry = map.get(catalog['airports'], vertexA)
+        airport = me.getValue(entry)
+        table.add_row([airport['IATA'], airport['Name'], airport['City'], airport['Country']])
+    lastvertex = lt.lastElement(stops)
+    entry = map.get(catalog['airports'], lastvertex['vertexB'])
+    last = me.getValue(entry)
+    table.add_row([last['IATA'], last['Name'], last['City'], last['Country']])
+    return table
 
 
     
