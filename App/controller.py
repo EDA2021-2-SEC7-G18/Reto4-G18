@@ -19,6 +19,7 @@
  * You should have received a copy of the GNU General Public License
  * along withthis program.  If not, see <http://www.gnu.org/licenses/>.
  """
+import prettytable
 import config as cf
 import model
 from DISClib.ADT import list as lt
@@ -89,6 +90,12 @@ def BuildTable(catalog, city):
     return condition
 #req 4
 #req 5
+def req5table(lista):
+    table = prettytable.PrettyTable()
+    table.field_names = ['IATA', 'Name', 'City', 'Country']
+    for item in lt.iterator(lista):
+        table.add_row([item['IATA'], item['Name'], item['City'], item['Country']])
+    return table
 #req 6
 #req 7
 # Funciones de ordenamiento
