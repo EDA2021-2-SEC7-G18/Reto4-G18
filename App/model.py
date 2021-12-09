@@ -134,8 +134,32 @@ def BuildTable(catalog, issue):
     
 #req 4
 #req 5
-def SearchAffectedAirports(catalog, IATAfuera):
-    return None
+def getbothwaysadj(catalog, cerrado):
+    lista= []
+    adyacentes = grph.adjacents(catalog['Fullroutes'], cerrado)
+    for adyacente in lt.iterator(adyacentes):
+            if grph.getEdge(catalog['Fullroutes'], adyacente, cerrado) is not None:
+                if adyacente not in lista:
+                    lista.append(adyacente)
+    return lista
+
+def getparaagregar(catalog, lista):
+    paraagregar = lt.newList()
+    if len(lista)>= 6:
+        primeros = lista[:3]
+        ultimos = lista[-3:]
+        for elemento in primeros:
+            info =me.getValue(map.get(catalog['airports'], elemento))
+            lt.addLast(paraagregar, info)
+        for elemento in ultimos:
+            info =me.getValue(map.get(catalog['airports'], elemento))
+            lt.addLast(paraagregar, info)
+    else: 
+        ultimos = lista
+        for elemento in ultimos:
+            info =me.getValue(map.get(catalog['airports'], elemento))
+            lt.addLast(paraagregar, info)
+    return paraagregar
 #req 6
 #req 7
 # Funciones para creacion de datos
