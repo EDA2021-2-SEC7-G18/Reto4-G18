@@ -146,8 +146,8 @@ while True:
       
     
     elif int(inputs[0]) == 5:
-        IATAfuera = str(input('ingrese el codigo IATA del aeropuerto que esta fuera de funcionamiento'))
-        print(BreadhtFisrtSearch(catalog['Bothwaysroutes'], IATAfuera))
+        origin = str(input('Ingrese el codigo IATA del aeropuerto de origen'))
+        availablemiles = str(input('ingrese las millas disponibles'))
         print("Buscando ciudades recomendadas para viajar ....")
     
 
