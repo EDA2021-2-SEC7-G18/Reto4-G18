@@ -51,8 +51,8 @@ def printMenu():
     print("6- Cuantificar el efecto de un aeropuerto cerrado")
 
 def files():
-    airports_filepath = cf.data_dir + 'airports-utf8-small.csv'
-    routes_filepath = cf.data_dir + 'routes-utf8-small.csv'
+    airports_filepath = cf.data_dir + 'airports-utf8-large.csv'
+    routes_filepath = cf.data_dir + 'routes-utf8-large.csv'
     cities_filepath = cf.data_dir + 'worldcities-utf8.csv'
     airports_file = csv.DictReader(open(airports_filepath, encoding="utf-8"),
                                 delimiter=",")
@@ -95,38 +95,41 @@ while True:
         
         
     elif int(inputs[0]) == 2:
+        starttime = time.time()
         amountconnected, keys, connectionsmap = controller.MostConnected(catalog['Fullroutes'])
         table = controller.BuildMostConnectedTable(catalog,connectionsmap,keys)
         print('Connected airports inside network: ', amountconnected)
         print('\n The TOP 5 most connected aiports... \n', table)
+        print("--- %s seconds ---" % (time.time() - starttime))
         
     elif int(inputs[0]) == 3:
         verta = input("Ingrese el codigo IATA del aeropuerto 1: ")
         vertb = input("Ingrese el codigo IATA del aeropuerto 2: ")
+        starttime = time.time()
         componentes = controller.getcomponents(catalog['Fullroutes'])
         together = controller.RSC(catalog['Fullroutes'],verta, vertb )
         print('componentes ' + str(componentes))
         print('strongly connected: ' + str(together))
+        print("--- %s seconds ---" % (time.time() - starttime))
         
 
 
     elif int(inputs[0]) == 4:
-        origen = str(input('Ingrese el nombre de la ciudad de origen'))
+        origen = str(input('Ingrese el nombre de la ciudad de origen '))
         entry = map.get(catalog['CityNameIndex'], origen)
         citieslist = me.getValue(entry)
         table = controller.BuildTable(catalog, citieslist)
         print(table)
-        eleccion = int(input('ingrese el numero en el que esta la ciudad que desea'))
+        eleccion = int(input('ingrese el numero en el que esta la ciudad que desea '))
         origen_elect = lt.getElement(citieslist, eleccion+1)
-        print(origen_elect)
-        destino = str(input('Ingrese el nombre de la ciudad destino'))
+        destino = str(input('Ingrese el nombre de la ciudad destino '))
         entry2 = map.get(catalog['CityNameIndex'], destino)
         citieslist2 = me.getValue(entry2)
         table2 = controller.BuildTable(catalog, citieslist2)
         print(table2)
-        eleccion = int(input('ingrese el numero en el que esta la ciudad que desea'))
+        eleccion = int(input('ingrese el numero en el que esta la ciudad que desea '))
         destino_elect = lt.getElement(citieslist2, eleccion+1)
-        print(destino_elect)
+        starttime = time.time()
         origindict, destinydict, path = controller.Closest_Path(catalog, origen_elect, destino_elect)
         distancebetweenairports= float(origindict['distance']) + float(destinydict['distance'])
         origintable = controller.Build_Tables_Req_5(catalog, origindict)
@@ -136,8 +139,9 @@ while True:
         stopstable = controller.StopsTable(catalog, path)
         print('+++ The departure airport in', origen_elect['city_ascii'], 'is +++\n' ,origintable)
         print('+++ The arrival airport in', destino_elect['city_ascii'], 'is +++\n' ,destinytable)
-        print('+++ Dijkstras Trip details +++\n', '- Total Route Distance: ', weightsum,' (km) \n', '- Total Distance (counting distance between cities and airport): ', round(totaldistance,3),' (km) \n','- Trip Path:\n', pathtable)
+        print('+++ Dijkstras Trip details +++\n', '- Total Route Distance: ', round(float(weightsum),3),' (km) \n', '- Total Distance (counting distance between cities and airport): ', round(totaldistance,3),' (km) \n','- Trip Path:\n', pathtable)
         print('+++ Trip Stops +++ \n', stopstable)
+        print("--- %s seconds ---" % (time.time() - starttime))
       
     
     elif int(inputs[0]) == 5:
