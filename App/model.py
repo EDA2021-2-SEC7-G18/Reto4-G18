@@ -282,6 +282,29 @@ def StopsTable(catalog, stops):
 #req 4
 
 #req 5
+def listaafectados(catalog,cerrado):
+    arcos = grph.edges(catalog['Fullroutes'])
+    newlist = lt.newList(datastructure='ARRAY_LIST')
+    for item in lt.iterator(arcos):
+        vertexA = str(item['vertexA'])
+        vertexB = str(item['vertexB'])
+        if vertexA == cerrado:
+            if not lt.isPresent(newlist, vertexB):
+                lt.addLast(newlist, vertexB)
+        elif vertexB == cerrado:
+            if not lt.isPresent(newlist, vertexA):
+                lt.addLast(newlist, vertexA)
+    return newlist
+
+def req5table(catalog, lista):
+    table = PrettyTable()
+    table.field_names = ['IATA', 'Name', 'City', 'Country']
+    for item in lt.iterator(lista):
+        entry = map.get(catalog['airports'], str(item))
+        airport = me.getValue(entry)
+        table.add_row([airport['IATA'], airport['Name'], airport['City'], airport['Country']])
+    return table
+
 def getbothwaysadj(catalog, cerrado):
     lista= []
     adyacentes = grph.adjacents(catalog['Fullroutes'], cerrado)

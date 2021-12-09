@@ -114,13 +114,11 @@ def StopsTable(catalog, stop):
     return model.StopsTable(catalog, stop)
 #req 4
 #req 5
-def req5table(lista):
-    table = prettytable.PrettyTable()
-    table.field_names = ['IATA', 'Name', 'City', 'Country']
-    for item in lt.iterator(lista):
-        table.add_row([item['IATA'], item['Name'], item['City'], item['Country']])
-    return table
+def listaafectados(catalog, cerrado):
+    return model.listaafectados(catalog,cerrado)
 
+def req5table(catalog, lista):
+    return model.req5table(catalog, lista)
 def getbothwaysadj(catalog, cerrado):
     return model.getbothwaysadj(catalog, cerrado)
 

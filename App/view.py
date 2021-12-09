@@ -51,8 +51,8 @@ def printMenu():
     print("6- Cuantificar el efecto de un aeropuerto cerrado")
 
 def files():
-    airports_filepath = cf.data_dir + 'airports-utf8-large.csv'
-    routes_filepath = cf.data_dir + 'routes-utf8-large.csv'
+    airports_filepath = cf.data_dir + 'airports-utf8-small.csv'
+    routes_filepath = cf.data_dir + 'routes-utf8-small.csv'
     cities_filepath = cf.data_dir + 'worldcities-utf8.csv'
 
     airports_file = csv.DictReader(open(airports_filepath, encoding="utf-8"),
@@ -152,15 +152,20 @@ while True:
     
 
     elif int(inputs[0]) == 6:
-        cerrado = input("Ingrese el codigo IATA del aeropuerto cerrado: ")
-        print("Calculando el efecto de aeropuerto cerrado ....")
+        cerrado = str(input("Ingrese el codigo IATA del aeropuerto cerrado: "))
         starttime = time.time()
-        lista =  controller.getbothwaysadj(catalog, cerrado)
-        paraagregar = controller.getparaagregar(catalog, lista)
-        table = controller.req5table(paraagregar)
+        listaafectados = controller.listaafectados(catalog, cerrado)
+        print(listaafectados)
+        firstthree = lt.subList(listaafectados,0,3)
+        firstable = controller.req5table(catalog, firstthree)
+        size=lt.size(listaafectados)
+        print(listaafectados)
 
-        print(str(len(lista)) + ' aeropuertos fueron afectados por el cierre de ' + str(cerrado))
-        print(table)
+        lastthree =lt.subList(listaafectados, size-3, 3)
+        lasttable = controller.req5table(catalog, lastthree)
+        print("Calculando el efecto de aeropuerto cerrado ....")
+        print(str(len(listaafectados)) + ' aeropuertos fueron afectados por el cierre de ' + str(cerrado))
+        print(firstable,'\n', lasttable)
         print("--- %s seconds ---" % (time.time() - starttime))
     else:
         sys.exit(0)
