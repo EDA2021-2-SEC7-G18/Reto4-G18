@@ -93,42 +93,11 @@ def Bothwaysroutes(catalog):
 
 def MostConnected(graph):
     return model.MostConnected(graph)
+
 def BuildMostConnectedTable(catalog, connectionsmap, top5):
     return model.BuildMostConnectedTable(catalog, connectionsmap, top5)
     
 #req 2
-#req 3
-def BuildTable(catalog, city):
-    if city != None:
-        condition = model.BuildTable(catalog, city)
-    else:
-        condition = 'City not Found'
-    return condition
-def Closest_Path(catalog, ciudadorigen, ciudaddestino):
-    return model.Closest_Path(catalog, ciudadorigen, ciudaddestino)
-def Build_Tables_Req_5(catalog, dictionary):
-    return model.Build_Tables_Req_5(catalog, dictionary)
-def Build_Path_Table(catalog, path):
-    return model.Build_Path_Table(catalog, path)
-def StopsTable(catalog, stop):
-    return model.StopsTable(catalog, stop)
-#req 4
-#req 5
-def listaafectados(catalog, cerrado):
-    return model.listaafectados(catalog,cerrado)
-
-def req5table(catalog, lista):
-    return model.req5table(catalog, lista)
-def getbothwaysadj(catalog, cerrado):
-    return model.getbothwaysadj(catalog, cerrado)
-
-def getparaagregar(catalog, lista):
-    return model.getparaagregar(catalog, lista)
-#req 6
-#req 7
-# Funciones de ordenamiento
-
-# Funciones de consulta sobre el catálogo
 def getcomponents(graph):
     sc = scc.KosarajuSCC(graph)
     return scc.connectedComponents(sc)
@@ -136,3 +105,45 @@ def getcomponents(graph):
 def RSC(graph, verta, vertb):
     graphone = scc.KosarajuSCC(graph)
     return scc.stronglyConnected(graphone, verta, vertb)
+
+#req 3
+
+def BuildTable(catalog, city):
+    if city != None:
+        condition = model.BuildTable(catalog, city)
+    else:
+        condition = 'City not Found'
+    return condition
+
+def Closest_Path(catalog, ciudadorigen, ciudaddestino):
+    return model.Closest_Path(catalog, ciudadorigen, ciudaddestino)
+
+def Build_Tables_Req_5(catalog, dictionary):
+    return model.Build_Tables_Req_5(catalog, dictionary)
+
+def Build_Path_Table(catalog, path):
+    if path is None:
+        condition = 'There is no path between the origin and the destiny'
+    else:
+        condition = model.Build_Path_Table(catalog, path)
+    return condition
+
+def StopsTable(catalog, stop):
+    return model.StopsTable(catalog, stop)
+
+#req 4
+#req 5
+
+def listaafectados(catalog, cerrado):
+    return model.listaafectados(catalog,cerrado)
+
+def req5table(catalog, lista):
+    if lista is None:
+        condition = 'No aiport was affected by this closure'
+    else:
+        condition = model.req5table(catalog, lista)
+    return condition
+
+# Funciones de ordenamiento
+
+# Funciones de consulta sobre el catálogo

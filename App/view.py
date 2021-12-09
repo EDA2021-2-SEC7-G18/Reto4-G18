@@ -33,6 +33,7 @@ from DISClib.ADT import orderedmap as om
 from DISClib.ADT import map 
 from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Graphs.bfs import BreadhtFisrtSearch
+from DISClib.Algorithms.Graphs import prim
 from haversine import haversine
 """
 La vista se encarga de la interacción con el usuario
@@ -147,6 +148,7 @@ while True:
     
     elif int(inputs[0]) == 5:
         origin = str(input('Ingrese el codigo IATA del aeropuerto de origen'))
+        print(prim.PrimMST(catalog['Bothwaysroutes']))
         availablemiles = str(input('ingrese las millas disponibles'))
         print("Buscando ciudades recomendadas para viajar ....")
     
@@ -155,18 +157,22 @@ while True:
         cerrado = str(input("Ingrese el codigo IATA del aeropuerto cerrado: "))
         starttime = time.time()
         listaafectados = controller.listaafectados(catalog, cerrado)
-        print(listaafectados)
         firstthree = lt.subList(listaafectados,0,3)
         firstable = controller.req5table(catalog, firstthree)
         size=lt.size(listaafectados)
-        print(listaafectados)
-
-        lastthree =lt.subList(listaafectados, size-3, 3)
-        lasttable = controller.req5table(catalog, lastthree)
+        if ((size % 3) != 0) and (size > 3):
+            lastthree =lt.subList(listaafectados, size-(size % 3), size % 3)
+            lasttable = controller.req5table(catalog, lastthree)
+        elif ((size % 3) == 0) and (size >3):
+            lastthree =lt.subList(listaafectados, size-3, 3)
+            lasttable = controller.req5table(catalog, lastthree)
+        elif (size == 3) or (size < 3):
+            lastable = ''
         print("Calculando el efecto de aeropuerto cerrado ....")
         print(str(len(listaafectados)) + ' aeropuertos fueron afectados por el cierre de ' + str(cerrado))
         print(firstable,'\n', lasttable)
         print("--- %s seconds ---" % (time.time() - starttime))
+
     else:
         sys.exit(0)
 sys.exit(0)
