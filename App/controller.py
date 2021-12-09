@@ -44,6 +44,10 @@ def initcatalog():
     return model.newcatalog()
 
 # Funciones para la carga de datos
+def updateLatitude(catalog):
+    airportslist = catalog['listairports']
+    for airport in lt.iterator(airportslist):
+        model.updateLatitude(catalog, airport)
 def updatecitiesindices(catalog, cities_file):
     for city in cities_file:
         model.AddCityByName(catalog, city)
@@ -53,6 +57,7 @@ def loadcatalog(catalog, airports_file, routes_file, cities_file):
     addroutes(catalog, routes_file)
     addauxindex(catalog)
     updatecitiesindices(catalog, cities_file)
+    updateLatitude(catalog)
     
 
 def getfirstcity(cities_file):
@@ -75,10 +80,12 @@ def Bothwaysroutes(catalog):
         adyacentes = grph.adjacents(catalog['Fullroutes'], airport)
         for vertexb in lt.iterator(adyacentes):
             peso = e.weight(grph.getEdge(catalog['Fullroutes'], airport, vertexb))
-            if grph.getEdge(catalog['Fullroutes'], airport, vertexb):
+            if grph.getEdge(catalog['Fullroutes'], vertexb, airport):
                 if grph.getEdge(catalog['Bothwaysroutes'], airport, vertexb) is None: #adyacenteb not in res:
-                    grph.insertVertex(catalog['Bothwaysroutes'], airport)
-                    grph.insertVertex(catalog['Bothwaysroutes'], vertexb)
+                    if not grph.containsVertex(catalog['Bothwaysroutes'], airport):
+                        grph.insertVertex(catalog['Bothwaysroutes'], airport)
+                    if not grph.containsVertex(catalog['Bothwaysroutes'], vertexb):
+                        grph.insertVertex(catalog['Bothwaysroutes'], vertexb)
                     grph.addEdge(catalog['Bothwaysroutes'], airport, vertexb, peso)
                     
 
@@ -97,6 +104,14 @@ def BuildTable(catalog, city):
     else:
         condition = 'City not Found'
     return condition
+def Closest_Path(catalog, ciudadorigen, ciudaddestino):
+    return model.Closest_Path(catalog, ciudadorigen, ciudaddestino)
+def Build_Tables_Req_5(catalog, dictionary):
+    return model.Build_Tables_Req_5(catalog, dictionary)
+def Build_Path_Table(catalog, path):
+    return model.Build_Path_Table(catalog, path)
+def StopsTable(catalog, stop):
+    return model.StopsTable(catalog, stop)
 #req 4
 #req 5
 def req5table(lista):
