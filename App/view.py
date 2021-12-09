@@ -21,6 +21,7 @@
  """
 
 #rom App.model import addairport
+import prettytable
 import model
 import config as cf
 import sys
@@ -54,6 +55,7 @@ def files():
     airports_filepath = cf.data_dir + 'airports-utf8-small.csv'
     routes_filepath = cf.data_dir + 'routes-utf8-small.csv'
     cities_filepath = cf.data_dir + 'worldcities-utf8.csv'
+
     airports_file = csv.DictReader(open(airports_filepath, encoding="utf-8"),
                                 delimiter=",")
     routes_file = csv.DictReader(open(routes_filepath, encoding="utf-8"),
@@ -138,8 +140,37 @@ while True:
     
 
     elif int(inputs[0]) == 6:
+        cerrado = input("Ingrese el codigo IATA del aeropuerto cerrado: ")
         print("Calculando el efecto de aeropuerto cerrado ....")
+        starttime = time.time()
+        adyacentes = grph.adjacents(catalog['Fullroutes'], cerrado)
+        lista = []
+        for adyacente in lt.iterator(adyacentes):
+            if grph.getEdge(catalog['Fullroutes'], adyacente, cerrado) is not None:
+                if adyacente not in lista:
+                    lista.append(adyacente)
         
+        paraagregar = lt.newList()
+        if len(lista)>= 6:
+            primeros = lista[:3]
+            ultimos = lista[-3:]
+            for elemento in primeros:
+                info =me.getValue(map.get(catalog['airports'], elemento))
+                lt.addLast(paraagregar, info)
+            for elemento in ultimos:
+                info =me.getValue(map.get(catalog['airports'], elemento))
+                lt.addLast(paraagregar, info)
+        else: 
+            ultimos = lista
+            for elemento in ultimos:
+                info =me.getValue(map.get(catalog['airports'], elemento))
+                lt.addLast(paraagregar, info)
+        
+        table = controller.req5table(paraagregar)
+
+        print(str(len(lista)) + ' aeropuertos fueron afectados por el cierre de ' + str(cerrado))
+        print(table)
+        print("--- %s seconds ---" % (time.time() - starttime))
     else:
         sys.exit(0)
 sys.exit(0)
