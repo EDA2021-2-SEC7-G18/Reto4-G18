@@ -157,6 +157,124 @@ def BuildTable(catalog, issue):
         table.add_row([counter, str(item['city']), str(item['country']),str(item['admin_name']), str(item['lng']), str(item['lat'])])
         counter += 1
     return table
+def Closest_To_Destiny(catalog, ciudad):
+    lat = float(ciudad['lat'])
+    lng = float(ciudad['lng'])
+    upperlat = float(lat)
+    lowerlat = float(lat)
+    upperlng = float(lng)
+    lowerlng = float(lng)
+    airportstree = om.newMap(omaptype='RBT', comparefunction = CompareDistance)
+    while om.size(airportstree) < 1:
+        upperlat += 0.1
+        lowerlat -= 0.1
+        upperlng += 0.1
+        lowerlng -= 0.1
+        lat_in_range = om.keys(catalog['CoordinatesTree'],str(lowerlat), str(upperlat))
+        for latitude in lt.iterator(lat_in_range):
+            if lat_in_range is not None:
+                entry = om.get(catalog['CoordinatesTree'], str(latitude))
+                longitudeindex = me.getValue(entry)
+                for airport in lt.iterator(longitudeindex):
+                    IATAcode = airport['IATA']
+                    if lowerlng < float(airport['longitude']) < upperlng:
+                        city_coordinates = (lat,lng)
+                        airport_coordinates = (float(latitude), float(airport['longitude']))
+                        distance = haversine(city_coordinates, airport_coordinates)
+                        if not om.contains(airportstree, str(distance)):
+                            om.put(airportstree, str(distance), str(IATAcode))
+    return airportstree
+
+def Closest_Path(catalog, ciudadorigen, ciudaddestino):
+    lat = float(ciudadorigen['lat'])
+    lng = float(ciudadorigen['lng'])
+    upperlat = float(lat)
+    lowerlat = float(lat)
+    upperlng = float(lng)
+    lowerlng = float(lng)
+    airportstree = om.newMap(omaptype='RBT', comparefunction=CompareDistance)
+    destinytree = Closest_To_Destiny(catalog, ciudaddestino)
+    closestdestiny = om.minKey(destinytree)
+    entry = om.get(destinytree, str(closestdestiny))
+    destinyIATA = me.getValue(entry)
+    condition = True
+    while condition:
+        upperlat += 0.1
+        lowerlat -= 0.1
+        upperlng += 0.1
+        lowerlng -= 0.1
+        lat_in_range = om.keys(catalog['CoordinatesTree'],str(lowerlat), str(upperlat))
+        if lat_in_range != None:
+            for latitude in lt.iterator(lat_in_range):
+                entry = om.get(catalog['CoordinatesTree'], str(latitude))
+                longitudeindex = me.getValue(entry)
+                for airport in lt.iterator(longitudeindex):
+                    IATAcode = airport['IATA']
+                    if lowerlng < float(airport['longitude']) < upperlng:
+                            city_coordinates = (lat,lng)
+                            airport_coordinates = (float(latitude), float(airport['longitude']))
+                            distance = haversine(city_coordinates, airport_coordinates)
+                            if not om.contains(airportstree, str(distance)):
+                                om.put(airportstree, str(distance), str(IATAcode))
+        keys = om.keySet(airportstree)
+        for item in lt.iterator(keys):
+            entry = om.get(airportstree, item)
+            codigoIATA = me.getValue(entry)
+            search = djk.Dijkstra(catalog['Fullroutes'], codigoIATA)
+            if djk.hasPathTo(search, destinyIATA):
+                origindict = OrderedDict()
+                destinydict = OrderedDict()
+                origindict['distance'] = item
+                origindict['IATA'] = codigoIATA
+                destinydict['distance'] = closestdestiny
+                destinydict['IATA'] = destinyIATA
+                minpath = djk.pathTo(search, destinyIATA)
+                condition = False
+    return origindict, destinydict, minpath
+def Build_Tables_Req_5(catalog, dictionary):
+    table=PrettyTable()
+    table.field_names = ['IATA', 'Name', 'City' , 'Country']
+    table.align='l'
+    table._max_width= {'IATA':5, 'Name':30, 'City':15 , 'Country':15}
+    IATAcode = dictionary['IATA']
+    entry = map.get(catalog['airports'], IATAcode)
+    airport = me.getValue(entry)
+    table.add_row([IATAcode, airport['Name'], airport['City'], airport['Country']])
+    return table
+
+def Build_Path_Table(catalog, path):
+    table=PrettyTable()
+    table.field_names = ['Airline', 'Departure', 'Destination', 'distance_km']
+    table.align='l'
+    table._max_width= {'Airline':5, 'Departure':10, 'Destination':10, 'distance_km':10}
+    weightsum = 0.0
+    for item in lt.iterator(path):
+        weight = item['weight']
+        weightsum += float(weight)
+        vertexA = item['vertexA']
+        vertexB = item['vertexB']
+        key = str(vertexA) + ',' + str(vertexB) + ',' + str(weight)
+        airlineentry = map.get(catalog['RoutesMap'],key)
+        airline = me.getValue(airlineentry)
+        table.add_row([airline, vertexA, vertexB, weight])
+    return weightsum, table
+def StopsTable(catalog, stops):          
+    table=PrettyTable()
+    table.field_names = ['IATA', 'Name', 'City' , 'Country']
+    table.align='l'
+    table._max_width= {'IATA':5, 'Name':30, 'City':15 , 'Country':15}
+    for item in lt.iterator(stops):
+        vertexA = item['vertexA']
+        entry = map.get(catalog['airports'], vertexA)
+        airport = me.getValue(entry)
+        table.add_row([airport['IATA'], airport['Name'], airport['City'], airport['Country']])
+    lastvertex = lt.lastElement(stops)
+    entry = map.get(catalog['airports'], lastvertex['vertexB'])
+    last = me.getValue(entry)
+    table.add_row([last['IATA'], last['Name'], last['City'], last['Country']])
+    return table
+
+
     
 def Closest_To_Destiny(catalog, ciudad):
     lat = float(ciudad['lat'])
