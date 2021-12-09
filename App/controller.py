@@ -120,6 +120,12 @@ def req5table(lista):
     for item in lt.iterator(lista):
         table.add_row([item['IATA'], item['Name'], item['City'], item['Country']])
     return table
+
+def getbothwaysadj(catalog, cerrado):
+    return model.getbothwaysadj(catalog, cerrado)
+
+def getparaagregar(catalog, lista):
+    return model.getparaagregar(catalog, lista)
 #req 6
 #req 7
 # Funciones de ordenamiento
